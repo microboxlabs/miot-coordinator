@@ -116,6 +116,7 @@ jobs:
             target/*.jar
             target/Dockerfile
             target/extensions/
+            target/license/
             target/*.properties
             target/*.xml
           retention-days: 1
