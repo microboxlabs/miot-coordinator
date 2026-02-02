@@ -49,7 +49,7 @@ env:
   # Image name derived from repository (e.g., microboxlabs/miot-coordinator)
   IMAGE_NAME: ${{ github.repository }}
   # Build configuration
-  AMP_JS_CONSOLE_REPO: javascript-console-repo-0.7-SNAPSHOT.amp
+  AMP_JS_CONSOLE_SHARE: javascript-console-share-0.7-SNAPSHOT.amp
   AMP_REPO_PATH: Alfresco/alfresco-docker-installer/master/generators/app/templates/addons/amps
   RAW_GITHUB_URL: https://raw.githubusercontent.com
   # Java/Maven configuration
@@ -78,11 +78,11 @@ jobs:
       - name: Install AMP packages
         run: |
           mkdir -p .extensions/amps
-          curl -O '${{ env.RAW_GITHUB_URL }}/${{ env.AMP_REPO_PATH }}/${{ env.AMP_JS_CONSOLE_REPO }}'
+          curl -O '${{ env.RAW_GITHUB_URL }}/${{ env.AMP_REPO_PATH }}/${{ env.AMP_JS_CONSOLE_SHARE }}'
           mv javascript-console-repo-0.7-SNAPSHOT.amp .extensions/amps
 
       - name: Set up JDK ${{ env.JAVA_VERSION }}
-        uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4.7.1
+        uses: actions/setup-java@v5
         with:
           distribution: ${{ env.JAVA_DISTRIBUTION }}
           java-version: ${{ env.JAVA_VERSION }}
@@ -106,7 +106,7 @@ jobs:
       - name: Build with Maven
         # Skip integration tests (IT) as they require a running Alfresco instance
         # Integration tests can be run locally with: mvn verify -DskipITs=false
-        run: mvn -B verify -DskipITs --file pom.xml
+        run: mvn -B verify -DskipITs -Dacs.port=${{ vars.ACS_PORT }} -Dacs.host=${{ vars.ACS_HOST }} --file pom.xml
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v6
@@ -215,10 +215,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        uses: actions/checkout@v6
 
       - name: Download build artifacts
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        uses: actions/download-artifact@v7
         with:
           name: build-artifacts
           path: target
