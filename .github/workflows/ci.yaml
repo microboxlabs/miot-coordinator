@@ -49,7 +49,7 @@ env:
   # Image name derived from repository (e.g., microboxlabs/miot-coordinator)
   IMAGE_NAME: ${{ github.repository }}
   # Build configuration
-  AMP_JS_CONSOLE_SHARE: javascript-console-share-0.7-SNAPSHOT.amp
+  AMP_JS_CONSOLE_REPO: javascript-console-repo-0.7-SNAPSHOT.amp
   AMP_REPO_PATH: Alfresco/alfresco-docker-installer/master/generators/app/templates/addons/amps
   RAW_GITHUB_URL: https://raw.githubusercontent.com
   # Java/Maven configuration
@@ -78,8 +78,8 @@ jobs:
       - name: Install AMP packages
         run: |
           mkdir -p .extensions/amps
-          curl -O '${{ env.RAW_GITHUB_URL }}/${{ env.AMP_REPO_PATH }}/${{ env.AMP_JS_CONSOLE_SHARE }}'
-          mv javascript-console-repo-0.7-SNAPSHOT.amp .extensions/amps
+          curl -O '${{ env.RAW_GITHUB_URL }}/${{ env.AMP_REPO_PATH }}/${{ env.AMP_JS_CONSOLE_REPO }}'
+          mv ${{ env.AMP_JS_CONSOLE_REPO }} .extensions/amps
 
       - name: Set up JDK ${{ env.JAVA_VERSION }}
         uses: actions/setup-java@v5
