@@ -288,6 +288,25 @@
                         </configuration>
                     </execution>
                     <execution>
+                        <id>copy-repo-amp-extensions</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/extensions</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>.extensions/amps</directory>
+                                    <includes>
+                                        <include>*.amp</include>
+                                    </includes>
+                                    <filtering>false</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
                         <id>copy-repository-tests</id>
                         <phase>pre-integration-test</phase>
                         <goals>
