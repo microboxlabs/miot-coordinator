@@ -29,8 +29,8 @@ miot-coordinator/
 │   │           ├── extension/templates/webscripts/  # Web script templates (JS, FTL)
 │   │           └── module/miot-coordinator/         # Module definition root
 │   │               ├── module.properties            # Module metadata
-│   │               ├── module-context.xml           # Spring context root
-│   │               ├── context/                     # Spring bean definitions
+│   │               ├── module-context.xml           # Spring context root (component scanning enabled)
+│   │               ├── context/                     # Minimal XML for Alfresco bootstrap wiring
 │   │               ├── model/                       # Custom content and workflow models
 │   │               ├── workflow/                    # BPMN 2.0 process definitions
 │   │               └── messages/                    # i18n resource bundles
@@ -132,14 +132,24 @@ Integration tests communicate with the ACS instance over HTTP. The endpoint is c
 - **Encoding:** UTF-8 (`project.build.sourceEncoding` and `project.reporting.outputEncoding`)
 - **No explicit linter/formatter** is configured; follow existing patterns in the codebase
 
+### Spring Configuration
+
+This project uses **annotation-based Spring configuration**. Component scanning is enabled for the `com.microboxlabs` package in `module-context.xml`. Prefer Spring annotations over XML bean definitions:
+
+- Use `@Component`, `@Service`, `@Repository` to declare beans
+- Use `@Autowired` or constructor injection for dependencies
+- Use `@Qualifier` when multiple beans of the same type exist
+- XML context files under `context/` should remain minimal — only use XML for Alfresco-specific bootstrap wiring (content models, workflows, i18n) that cannot be expressed via annotations
+
 ### Alfresco Conventions
 
 - **Module ID:** `miot-coordinator` (defined in `module.properties`)
-- **Spring contexts:** XML-based bean definitions under `src/main/resources/alfresco/module/miot-coordinator/context/`
-- **Content models:** XML-based, registered via `bootstrap-context.xml`
-- **Web scripts:** Consist of a descriptor (`.desc.xml`), controller (`.java` or `.js`), and template (`.ftl`)
-- **Workflows:** Activiti BPMN 2.0 XML, registered in `bootstrap-context.xml`
-- **i18n:** Properties files in `messages/` directory, loaded by the bootstrap context
+- **Spring context root:** `module-context.xml` — imports bootstrap, service, and webscript contexts; enables `<context:component-scan>` for `com.microboxlabs`
+- **XML contexts** (`context/*.xml`): Reserved for Alfresco-specific bootstrap registrations (content models, workflows, message bundles). New service beans should use annotations instead of XML definitions
+- **Content models:** XML-based, registered via `bootstrap-context.xml` (XML required by Alfresco)
+- **Web scripts:** Consist of a descriptor (`.desc.xml`), controller (`.java` or `.js`), and template (`.ftl`). Java-backed web script controllers can use `@Component` with Alfresco's `DeclarativeWebScript` base class
+- **Workflows:** Activiti BPMN 2.0 XML, registered in `bootstrap-context.xml` (XML required by Alfresco)
+- **i18n:** Properties files in `messages/` directory, loaded by the bootstrap context (XML required by Alfresco)
 
 ## Build and Deployment
 
@@ -209,6 +219,18 @@ This triggers the full pipeline: build, Maven Central publish, and Docker image 
 - **Database:** PostgreSQL is accessible at `localhost:5555` (user: `alfresco`, password: `alfresco`, database: `alfresco`)
 - **SOLR reindex issues:** Try `./run.sh purge` followed by `./run.sh build_start` for a clean slate
 - **Maven property substitution:** Resource files (`.properties`, `.xml`) under `src/main/docker/` and `docker/` are filtered by Maven during the `validate` phase. Verify processed output in `target/`
+
+## Documentation Sync
+
+When making changes, always check whether they affect content documented in `README.md` or guidelines defined in this `AGENTS.md`. If they do, update both files as part of the same change to keep documentation in sync. Examples of changes that require a documentation update:
+
+- Adding, removing, or renaming `run.sh` commands or Maven profiles
+- Changing build commands, Docker image names, registries, or tagging strategy
+- Modifying CI/CD pipeline triggers, jobs, or required secrets
+- Altering project structure, package names, or module configuration
+- Updating dependency versions referenced in documentation (Alfresco SDK, Java, etc.)
+- Changing development conventions (Spring config approach, testing patterns, code style)
+- Adding or modifying service endpoints, ports, or environment variables
 
 ## Additional Notes
 
