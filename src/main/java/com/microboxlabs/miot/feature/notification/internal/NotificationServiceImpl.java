@@ -34,7 +34,7 @@ import org.springframework.stereotype.Service;
  * Stores notification nodes under {@code <user-home>/notifications/}.
  */
 @Internal
-@Service("notificationService")
+@Service("miotNotificationService")
 public class NotificationServiceImpl implements NotificationService {
 
     private static final Logger logger = LoggerFactory.getLogger(NotificationServiceImpl.class);

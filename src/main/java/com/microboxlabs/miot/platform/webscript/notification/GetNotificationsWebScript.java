@@ -24,7 +24,7 @@ import org.springframework.stereotype.Component;
 public class GetNotificationsWebScript extends AbstractJsonWebScript {
 
     @Autowired
-    @Qualifier("notificationService")
+    @Qualifier("miotNotificationService")
     private NotificationService notificationService;
 
     @Autowired
