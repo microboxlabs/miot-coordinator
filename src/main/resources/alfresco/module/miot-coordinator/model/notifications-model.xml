@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model name="notifications:notificationsModel"
+       xmlns="http://www.alfresco.org/model/dictionary/1.0">
+
+    <description>Content model for user notifications</description>
+    <author>Microbox Labs</author>
+    <version>1.0</version>
+
+    <imports>
+        <import uri="http://www.alfresco.org/model/dictionary/1.0" prefix="d"/>
+        <import uri="http://www.alfresco.org/model/content/1.0" prefix="cm"/>
+    </imports>
+
+    <namespaces>
+        <namespace uri="http://www.microboxlabs.com/model/notifications/1.0"
+                   prefix="notifications"/>
+    </namespaces>
+
+    <types>
+        <type name="notifications:notification">
+            <title>Notification</title>
+            <parent>cm:content</parent>
+            <properties>
+                <property name="notifications:id">
+                    <title>Notification ID</title>
+                    <type>d:text</type>
+                    <mandatory>true</mandatory>
+                    <index enabled="true">
+                        <atomic>true</atomic>
+                        <stored>false</stored>
+                        <tokenised>false</tokenised>
+                    </index>
+                </property>
+                <property name="notifications:userId">
+                    <title>User ID</title>
+                    <type>d:text</type>
+                    <mandatory>true</mandatory>
+                    <index enabled="true">
+                        <atomic>true</atomic>
+                        <stored>false</stored>
+                        <tokenised>false</tokenised>
+                    </index>
+                </property>
+                <property name="notifications:message">
+                    <title>Message</title>
+                    <type>d:text</type>
+                    <mandatory>true</mandatory>
+                </property>
+                <property name="notifications:timestamp">
+                    <title>Timestamp</title>
+                    <type>d:datetime</type>
+                    <mandatory>true</mandatory>
+                </property>
+                <property name="notifications:isRead">
+                    <title>Read</title>
+                    <type>d:boolean</type>
+                    <default>false</default>
+                </property>
+                <property name="notifications:type">
+                    <title>Type</title>
+                    <type>d:text</type>
+                    <mandatory>true</mandatory>
+                </property>
+                <property name="notifications:url">
+                    <title>URL</title>
+                    <type>d:text</type>
+                    <mandatory>false</mandatory>
+                </property>
+            </properties>
+        </type>
+    </types>
+
+</model>

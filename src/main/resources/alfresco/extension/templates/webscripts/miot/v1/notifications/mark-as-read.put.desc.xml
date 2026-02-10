@@ -1,0 +1,8 @@
+<webscript>
+    <shortname>Mark Notification as Read</shortname>
+    <description>Marks a notification as read</description>
+    <url>/miot/v1/notifications/mark-as-read?id={id}</url>
+    <format default="json"/>
+    <authentication>user</authentication>
+    <transaction>required</transaction>
+</webscript>

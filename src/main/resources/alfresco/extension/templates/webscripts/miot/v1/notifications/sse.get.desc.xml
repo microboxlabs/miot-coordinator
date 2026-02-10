@@ -1,0 +1,8 @@
+<webscript>
+    <shortname>Notifications SSE</shortname>
+    <description>Returns notifications as a Server-Sent Events stream</description>
+    <url>/miot/v1/notifications/sse</url>
+    <format default="json"/>
+    <authentication>user</authentication>
+    <transaction>required</transaction>
+</webscript>

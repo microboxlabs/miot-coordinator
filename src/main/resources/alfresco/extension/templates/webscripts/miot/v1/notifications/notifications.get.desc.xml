@@ -1,0 +1,8 @@
+<webscript>
+    <shortname>Get Notifications</shortname>
+    <description>Returns notifications for the authenticated user</description>
+    <url>/miot/v1/notifications</url>
+    <format default="json"/>
+    <authentication>user</authentication>
+    <transaction>required</transaction>
+</webscript>
