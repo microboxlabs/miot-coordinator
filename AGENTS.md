@@ -20,13 +20,41 @@ miot-coordinator/
 │   └── docker-compose.yml           # Local dev environment (ACS, PostgreSQL, SOLR, ActiveMQ)
 ├── src/
 │   ├── main/
-│   │   ├── java/.../platformsample/ # Java source code (components, web scripts)
+│   │   ├── java/com/microboxlabs/miot/
+│   │   │   ├── core/                # Shared kernel: exceptions, annotations, utilities (no Alfresco deps)
+│   │   │   │   ├── annotation/      #   @Internal marker
+│   │   │   │   ├── config/          #   Shared @Configuration beans
+│   │   │   │   ├── exception/       #   MiotException hierarchy
+│   │   │   │   ├── model/           #   OperationResult, PagedResult value objects
+│   │   │   │   └── util/            #   Preconditions, JsonUtil helpers
+│   │   │   ├── feature/             # Self-contained feature modules
+│   │   │   │   ├── auth/            #   JWT/token utilities
+│   │   │   │   ├── content/         #   Node content management
+│   │   │   │   ├── http/            #   Generic REST client
+│   │   │   │   ├── job/             #   Async job scheduling
+│   │   │   │   ├── messagetemplates/ #  Dynamic message template rendering
+│   │   │   │   ├── messaging/       #   Internal event/message bus
+│   │   │   │   ├── monitoring/      #   Metrics/observability
+│   │   │   │   ├── notification/    #   Pluggable notification framework
+│   │   │   │   ├── properties/      #   Configuration management
+│   │   │   │   ├── sign/            #   PDF digital signing
+│   │   │   │   ├── sse/             #   Server-Sent Events
+│   │   │   │   ├── tasklistener/    #   Workflow task event dispatcher
+│   │   │   │   └── transform/       #   Document transformation (PDF, PNG)
+│   │   │   ├── integration/         # External system connectors
+│   │   │   │   ├── auth0/           #   Auth0 authentication
+│   │   │   │   └── pgrest/          #   PostgreSQL REST API
+│   │   │   └── platform/            # Alfresco-specific wiring
+│   │   │       ├── action/          #   Repository actions
+│   │   │       ├── bootstrap/       #   MiotModuleComponent (module init)
+│   │   │       ├── policy/          #   Content model behaviors
+│   │   │       ├── webscript/       #   AbstractMiotWebScript + health check
+│   │   │       └── workflow/        #   Workflow listeners/delegates
 │   │   ├── docker/                  # Dockerfile and ACS container configuration
 │   │   ├── assembly/                # AMP assembly descriptor and web resources
 │   │   └── resources/
-│   │       ├── META-INF/            # Static web resources (Web Fragment)
 │   │       └── alfresco/
-│   │           ├── extension/templates/webscripts/  # Web script templates (JS, FTL)
+│   │           ├── extension/templates/webscripts/  # Web script descriptors and FTL templates
 │   │           └── module/miot-coordinator/         # Module definition root
 │   │               ├── module.properties            # Module metadata
 │   │               ├── module-context.xml           # Spring context root (component scanning enabled)
@@ -34,9 +62,25 @@ miot-coordinator/
 │   │               ├── model/                       # Custom content and workflow models
 │   │               ├── workflow/                    # BPMN 2.0 process definitions
 │   │               └── messages/                    # i18n resource bundles
-│   └── test/java/.../platformsample/  # Unit and integration tests
-└── .github/workflows/ci.yaml         # CI/CD pipeline
+│   └── test/java/com/microboxlabs/miot/
+│       ├── core/                    # Core unit tests
+│       ├── platform/                # Platform unit tests
+│       └── testutil/                # IntegrationTestBase for future ITs
+└── .github/workflows/ci.yaml       # CI/CD pipeline
 ```
+
+### Package Dependency Rules
+
+```
+core  <──  feature  <──  integration
+  ^           ^               ^
+  └───────────┴───────────────┴─── platform (Alfresco-specific shell)
+```
+
+- **`core`** — Zero Alfresco dependencies. Depends on nothing else in the module.
+- **`feature`** — Depends only on `core`. Each feature is self-contained.
+- **`integration`** — Depends on `core` and optionally `feature` interfaces.
+- **`platform`** — Depends on everything above plus Alfresco APIs.
 
 ## Setup Commands
 
@@ -124,13 +168,25 @@ Integration tests communicate with the ACS instance over HTTP. The endpoint is c
 ## Code Style
 
 - **Language:** Java (JDK 17 target in CI; auto-selects 8/11/17 based on local JDK)
-- **Package structure:** `com.microboxlabs.miot.platformsample`
-- **Class naming:** PascalCase (`DemoComponent`, `HelloWorldWebScript`)
+- **Root package:** `com.microboxlabs.miot`
+- **Top-level packages:** `core`, `feature`, `integration`, `platform`
+- **Class naming:** PascalCase (`MiotModuleComponent`, `HealthCheckWebScript`)
 - **Method/variable naming:** camelCase
 - **Test classes:** `<ClassName>Test.java` for unit tests, `<ClassName>IT.java` for integration tests
 - **License headers:** Apache License 2.0 on all source files
 - **Encoding:** UTF-8 (`project.build.sourceEncoding` and `project.reporting.outputEncoding`)
 - **No explicit linter/formatter** is configured; follow existing patterns in the codebase
+
+### Feature Module Conventions
+
+Each feature under `feature/<name>/` follows:
+```
+api/         # Public interfaces, value objects, exceptions — the contract
+internal/    # @Service/@Component implementations — the details
+config/      # Optional @Configuration classes
+package-info.java
+```
+This convention makes extraction to a standalone Maven module mechanical: move the package to a new module with no renames needed. Mark implementation classes with `@Internal` to signal they are not public API.
 
 ### Spring Configuration
 
@@ -144,8 +200,8 @@ This project uses **annotation-based Spring configuration**. Component scanning 
 ### Alfresco Conventions
 
 - **Module ID:** `miot-coordinator` (defined in `module.properties`)
-- **Spring context root:** `module-context.xml` — imports bootstrap, service, and webscript contexts; enables `<context:component-scan>` for `com.microboxlabs`
-- **XML contexts** (`context/*.xml`): Reserved for Alfresco-specific bootstrap registrations (content models, workflows, message bundles). New service beans should use annotations instead of XML definitions
+- **Spring context root:** `module-context.xml` — imports bootstrap and webscript contexts; enables `<context:component-scan>` for `com.microboxlabs`
+- **XML contexts** (`context/*.xml`): Only `bootstrap-context.xml` (content models, workflows, i18n) and `webscript-context.xml` (web script bean wiring). Service beans use annotations exclusively — there is no `service-context.xml`
 - **Content models:** XML-based, registered via `bootstrap-context.xml` (XML required by Alfresco)
 - **Web scripts:** Consist of a descriptor (`.desc.xml`), controller (`.java` or `.js`), and template (`.ftl`). Java-backed web script controllers can use `@Component` with Alfresco's `DeclarativeWebScript` base class
 - **Workflows:** Activiti BPMN 2.0 XML, registered in `bootstrap-context.xml` (XML required by Alfresco)

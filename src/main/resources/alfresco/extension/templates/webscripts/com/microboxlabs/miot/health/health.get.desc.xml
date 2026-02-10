@@ -1,0 +1,7 @@
+<webscript>
+    <shortname>MIOT Health Check</shortname>
+    <description>Returns the health status of the MIOT Coordinator module</description>
+    <url>/com/microboxlabs/miot/health</url>
+    <authentication>none</authentication>
+    <format default="json"/>
+</webscript>

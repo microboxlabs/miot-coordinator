@@ -89,16 +89,25 @@ All services run as Docker containers. The run script offers these tasks:
 
 ### Project Structure
 
-- No parent pom
-- No WAR projects - JARs are included in custom docker images
-- No runner project - Alfresco environment is managed through Docker
+- No parent pom — single-module Maven project
+- No WAR projects — JARs are included in custom docker images
+- No runner project — Alfresco environment is managed through Docker
 - Standard JAR packaging and layout
 - Works seamlessly with Eclipse and IntelliJ IDEA
 - JRebel for hot reloading
 - AMP as an assembly
 - Persistent test data through Docker volumes
-- Resources loaded from META-INF
-- Web Fragment support (includes sample servlet)
+
+**Source code architecture** — four top-level packages under `com.microboxlabs.miot`:
+
+| Package | Purpose | Alfresco Dependency |
+|---------|---------|---------------------|
+| `core` | Shared kernel: exceptions, annotations, utilities | None |
+| `feature` | Self-contained feature modules (http, messaging, etc.) | None |
+| `integration` | External system connectors (pgrest, auth0) | None |
+| `platform` | Alfresco-specific wiring: bootstrap, web scripts, policies | Yes |
+
+Features follow an `api/` + `internal/` convention for clean separation of contract and implementation.
 
 ---
 
