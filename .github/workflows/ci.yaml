@@ -75,12 +75,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      - name: Install AMP packages
-        run: |
-          mkdir -p .extensions/amps
-          curl -O '${{ env.RAW_GITHUB_URL }}/${{ env.AMP_REPO_PATH }}/${{ env.AMP_JS_CONSOLE_REPO }}'
-          mv ${{ env.AMP_JS_CONSOLE_REPO }} .extensions/amps
-
       - name: Set up JDK ${{ env.JAVA_VERSION }}
         uses: actions/setup-java@v5
         with:
@@ -137,12 +131,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
-
-      - name: Install AMP packages
-        run: |
-          mkdir -p .extensions/amps
-          curl -O '${{ env.RAW_GITHUB_URL }}/${{ env.AMP_REPO_PATH }}/${{ env.AMP_JS_CONSOLE_REPO }}'
-          mv javascript-console-repo-0.7-SNAPSHOT.amp .extensions/amps
 
       - name: Set up JDK ${{ env.JAVA_VERSION }}
         uses: actions/setup-java@v5

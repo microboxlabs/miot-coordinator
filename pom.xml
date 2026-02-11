@@ -85,6 +85,12 @@
                      the Alfresco Maven IT Mojo runs as part of the parent project ... -->
     <dependencies>
         <dependency>
+            <groupId>org.orderofthebee.support-tools</groupId>
+            <artifactId>support-tools-repo</artifactId>
+            <version>1.2.3.0</version>
+        </dependency>
+        
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.13.1</version>
@@ -281,25 +287,6 @@
                                     <directory>target</directory>
                                     <includes>
                                         <include>${project.build.finalName}.jar</include>
-                                    </includes>
-                                    <filtering>false</filtering>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>copy-repo-amp-extensions</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}/extensions</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>.extensions/amps</directory>
-                                    <includes>
-                                        <include>*.amp</include>
                                     </includes>
                                     <filtering>false</filtering>
                                 </resource>
